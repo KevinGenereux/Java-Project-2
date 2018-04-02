@@ -99,6 +99,7 @@ public class TypingTestGUI extends JFrame {
 		typeWordsTextArea.setLineWrap(true);
 		typeWordsTextArea.setBorder(new LineBorder(Color.BLUE));
 		typeWordsTextArea.setEnabled(false);
+		typeWordsTextArea.setEditable(true);
 		add(typeWordsTextArea);
 		
 		typeWordsTextArea.addKeyListener(
@@ -199,6 +200,7 @@ public class TypingTestGUI extends JFrame {
 		CreateKeyboardButtons();
 		//Read in each pangram
 		ReadFile();
+		//Compare each word in the 
 
 	}
 
@@ -567,6 +569,10 @@ public class TypingTestGUI extends JFrame {
                 + fileName + "'");                  
 
         }
+	}
+	
+	public static boolean CompareWord() {
+		
 	}
 
 }
