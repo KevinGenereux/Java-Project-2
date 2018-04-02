@@ -79,7 +79,8 @@ public class TypingTestGUI extends JFrame {
 
 		pangramTextArea = new JTextArea();
 		pangramTextArea.setBounds(20, 123, 650, 100);
-		pangramTextArea.setFont(new Font("Times New Roman", Font.PLAIN, 32));
+		pangramTextArea.setFont(new Font("Times New Roman", Font.PLAIN, 40));
+		pangramTextArea.setForeground(Color.BLACK);
 		//makes it so that the last word on the line will get transferred to the next line instead of getting cut off
 		pangramTextArea.setLineWrap(true);
 		//gives the TextArea a border colour
@@ -94,9 +95,12 @@ public class TypingTestGUI extends JFrame {
 
 		typeWordsTextArea = new JTextArea();
 		typeWordsTextArea.setBounds(20, 258, 650, 100);
+		typeWordsTextArea.setFont(new Font("Times New Roman", Font.PLAIN, 32));
 		typeWordsTextArea.setLineWrap(true);
 		typeWordsTextArea.setBorder(new LineBorder(Color.BLUE));
+		typeWordsTextArea.setEnabled(false);
 		add(typeWordsTextArea);
+		
 		typeWordsTextArea.addKeyListener(
 		         new KeyListener()
 		         {
@@ -497,8 +501,10 @@ public class TypingTestGUI extends JFrame {
 	//The code for the countdown timer was taken from this YouTube video
 	//needed slight modification to work
 	private void startButtonMouseClicked(MouseEvent evt) {
-			//Only run the code if t
+			//Only run the code if the user clicks on the start button
 			if (toggle) {
+			//allow the user to type in the code
+			typeWordsTextArea.setEnabled(true);
 			//creates a new timer object
 			Timer timer = new Timer();
 			//setting the countdown timer to start at 60 seconds
@@ -541,7 +547,7 @@ public class TypingTestGUI extends JFrame {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             //Keep reading in lines until done
             while((line = bufferedReader.readLine()) != null) {
-                System.out.println(line);
+            	pangramTextArea.append(line + "\n");
             }   
 
             //Close file when done
