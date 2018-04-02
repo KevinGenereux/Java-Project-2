@@ -1,53 +1,73 @@
+/* Group Members: Kevin Genereux, Matthew Giorno, Noah Sissons
+ * 
+ */
+
 package Main;
 
+//importing libraries
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
-
+import java.io.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class TypingTestGUI extends JFrame {
 
+	//declaring variables
 	private JLabel titleLabel, pangramLabel, typeWordsLabel, timeLeftLabel, WPMLabel, accuracyLabel;
 	private JTextArea pangramTextArea, typeWordsTextArea;
 	private JTextField timeLeftTextField, WPMTextField, accuracyTextField;
+	private JButton startButton;
 
+	//1st row of keys
 	private JButton acuteButton, oneButton, twoButton, threeButton, fourButton, fiveButton, sixButton, sevenButton,
 			eightButton, nineButton, zeroButton, minusButton, plusButton, backspaceButton;
+	//2nd row of keys
 	private JButton tabButton, qButton, wButton, eButton, rButton, tButton, yButton, uButton, iButton, oButton, pButton,
 			leftClosedBraceButton, rightClosedBraceButton, backslashButton;
+	//3rd row of keys
 	private JButton capsButton, aButton, sButton, dButton, fButton, gButton, hButton, jButton, kButton, lButton,
 			semicolonButton, quoteButton, enterButton;
+	//4th row of keys
 	private JButton shiftOneButton, zButton, xButton, cButton, vButton, bButton, nButton, mButton, commaButton,
 			periodButton, forwardSlashButton, shiftTwoButton;
+	//5th row of keys
 	private JButton spaceButton;
-	private JButton startButton;
+	
 	private JButton[] keyJButtons = new JButton[KeyEvent.KEY_LAST + 1];
 	private JButton lastJButton;
+	
 	private int countdownTimer;
 	private boolean toggle = true;
-	private static Timer timer = new Timer();
-
+	
+	//A constructor for the GUI frame that immediately gets instantiated when the application is opened
 	public TypingTestGUI() {
+		
+		//calls the superclass constructor to give the application a title
 		super("Typing Application");
+		//absolute positioning layour
 		setLayout(null);
+		//changes the background colour to light blue
 		getContentPane().setBackground(new Color(204, 229, 255));
 
 		titleLabel = new JLabel("Typing Speed Test");
+		//changes the font of the label
 		titleLabel.setFont(new Font("Tahoma", Font.BOLD, 54));
+		//changes font colour
 		titleLabel.setForeground(Color.BLACK);
+		//setBounds(x-coordinate, y-coordinate, x length, y length)
 		titleLabel.setBounds(225, 10, 600, 65);
 		add(titleLabel);
 
@@ -60,7 +80,9 @@ public class TypingTestGUI extends JFrame {
 		pangramTextArea = new JTextArea();
 		pangramTextArea.setBounds(20, 123, 650, 100);
 		pangramTextArea.setFont(new Font("Times New Roman", Font.PLAIN, 32));
+		//makes it so that the last word on the line will get transferred to the next line instead of getting cut off
 		pangramTextArea.setLineWrap(true);
+		//gives the TextArea a border colour
 		pangramTextArea.setBorder(new LineBorder(Color.BLUE));
 		add(pangramTextArea);
 
@@ -89,12 +111,14 @@ public class TypingTestGUI extends JFrame {
 		        	     }
 		        	     changeColor(keyJButtons[buttonIndex]);
 		        	 }
-
+		        	
+		        	//when a key is reset, change its colour back to the default
 		            public void keyReleased(KeyEvent event)
 		            {
 		               resetColor();
 		            } 
-
+		            
+		            //declaring an empty method so that all methods in the interface are implemented
 		            public void keyTyped(KeyEvent event)
 		            {
 		            } 
@@ -157,15 +181,20 @@ public class TypingTestGUI extends JFrame {
 		startButton.setBounds(700, 315, 90, 45);
 		startButton.setBackground(new Color(176, 224, 230));
 		startButton.setBorder(new LineBorder(new Color(0, 0, 205)));
+		//creating a mouse listener class to handle mouse input
 		startButton.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent event) {
-				startButtonMouseClicked(event, timer);
+			//anonymous inner class for a MouseEvent
+			public void mouseClicked(MouseEvent event) {
+				//this method gets called when the user clicks
+				startButtonMouseClicked(event);
 			}
 		});
 		add(startButton);
-
+		
+		//Creates all the keyboard buttons and places them on the window
 		CreateKeyboardButtons();
-		PangramReader();
+		//Read in each pangram
+		ReadFile();
 
 	}
 
@@ -446,7 +475,7 @@ public class TypingTestGUI extends JFrame {
 		add(spaceButton);
 	}
 	
-	// highlight JButton passed as argument
+	//changes the colour of the JButton that is being pressed on to yellow
 	   private void changeColor(JButton changeJButton)
 	   {
 	      if (changeJButton != null)
@@ -464,29 +493,74 @@ public class TypingTestGUI extends JFrame {
 	         lastJButton.setBackground(this.getBackground());
 	   } 
 
-	private void startButtonMouseClicked(java.awt.event.MouseEvent evt, Timer timer) {//GEN-FIRST:event_btnStartMouseClicked
+	//https://www.youtube.com/watch?v=Euexl32lB8w
+	//The code for the countdown timer was taken from this YouTube video
+	//needed slight modification to work
+	private void startButtonMouseClicked(MouseEvent evt) {
+			//Only run the code if t
 			if (toggle) {
-            countdownTimer = 60; //setting the counter to 10 sec
-            TimerTask task = new TimerTask() {         
+			//creates a new timer object
+			Timer timer = new Timer();
+			//setting the countdown timer to start at 60 seconds
+            countdownTimer = 60;
+            //creates a new TimerTask object to set the parameters of the timer
+            TimerTask task = new TimerTask() { 
+            	//this keeps running
                 public void run() {
-                    timeLeftTextField.setText(Integer.toString(countdownTimer)); //the timer label to counter.
+                	//displays how much time is remaining
+                    timeLeftTextField.setText(Integer.toString(countdownTimer)); 
+                    //decrements the countdown timer
                     countdownTimer--;
+                    //once the timer has reached 0, deallocate the timer and display results
                     if (countdownTimer == 0)
                         timer.cancel();     
                 }
             };
-            timer.scheduleAtFixedRate(task, 0, 1000); // =  timer.scheduleAtFixedRate(task, delay, period);
+            //timer.scheduleAtFixedRate(task, delay, period);
+            timer.scheduleAtFixedRate(task, 0, 1000); 
 			}
+			//prevents the user from repeatedly clicking the start button and creating a bunch of timer buttons
+			//(this was the problem with the code from the YouTube video. It would cause the countdown timer to speed up if you keep clicking on it).
 			toggle = false;
       }
 	
-	private void PangramReader() {
-		try (BufferedReader br = new BufferedReader(new FileReader(Pangrams))) {
-		    String line;
-		    while ((line = br.readLine()) != null) {
-		       // process the line.
-		    }
-		}
+	//https://www.caveofprogramming.com/java/java-file-reading-and-writing-files-in-java.html
+	private void ReadFile() {
+		
+		// The name of the file to open.
+        String fileName = "Pangrams.txt";
+
+        // This will reference one line at a time
+        String line = null;
+
+        try {
+            // FileReader reads text files in the default encoding.
+            FileReader fileReader = new FileReader(fileName);
+
+            //Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            //Keep reading in lines until done
+            while((line = bufferedReader.readLine()) != null) {
+                System.out.println(line);
+            }   
+
+            //Close file when done
+            bufferedReader.close();         
+        }
+        //Report to user if there was a problem with opening up the file
+        catch(FileNotFoundException ex) {
+            System.out.println(
+                "Unable to open file '" + 
+                fileName + "'");                
+        }
+        
+        //Catch any errors that might occur when reading the file
+        catch(IOException ex) {
+            System.out.println(
+                "Error reading file '" 
+                + fileName + "'");                  
+
+        }
 	}
 
 }
