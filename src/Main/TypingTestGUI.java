@@ -6,6 +6,9 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -75,11 +78,17 @@ public class TypingTestGUI extends JFrame {
 		typeWordsTextArea.addKeyListener(
 		         new KeyListener()
 		         {
-		            public void keyPressed(KeyEvent event)
-		            {
-		               int buttonIndex = event.getKeyCode();
-		               changeColor(keyJButtons[buttonIndex]);
-		            }
+		        	 public void keyPressed(KeyEvent event)
+		        	 {
+		        	           int buttonIndex = event.getKeyCode();
+		        	           if (buttonIndex == KeyEvent.VK_SHIFT)
+		        	           if (event.getKeyLocation() == KeyEvent.KEY_LOCATION_RIGHT) {
+		        	           changeColor(keyJButtons[0xA1]);
+		        	           } else {
+		        	         changeColor(keyJButtons[0xA0]);
+		        	     }
+		        	     changeColor(keyJButtons[buttonIndex]);
+		        	 }
 
 		            public void keyReleased(KeyEvent event)
 		            {
@@ -91,6 +100,17 @@ public class TypingTestGUI extends JFrame {
 		            } 
 		         }
 		     );
+		
+		typeWordsTextArea.addFocusListener(
+		         new FocusAdapter() // anonymous inner class
+		         {
+		            // event handler called when outputJTextArea loses focus
+		            public void focusLost(FocusEvent event)
+		            {
+		               resetColor();
+		            } 
+		         } // end anonymous inner class
+		     ); // end call to addFocusListener
 		
 
 		timeLeftLabel = new JLabel("Time Left");
@@ -104,6 +124,7 @@ public class TypingTestGUI extends JFrame {
 		timeLeftTextField.setForeground(Color.BLACK);
 		timeLeftTextField.setBounds(700, 122, 80, 40);
 		timeLeftTextField.setBorder(new LineBorder(Color.BLACK));
+		timeLeftTextField.setHorizontalAlignment(JTextField.CENTER);
 		add(timeLeftTextField);
 
 		WPMLabel = new JLabel("Words Per Minute");
@@ -144,6 +165,7 @@ public class TypingTestGUI extends JFrame {
 		add(startButton);
 
 		CreateKeyboardButtons();
+		PangramReader();
 
 	}
 
@@ -359,7 +381,7 @@ public class TypingTestGUI extends JFrame {
 		// 4th Row
 		shiftOneButton = new JButton("Shift");
 		shiftOneButton.setBounds(20, 566, 148, 58);
-		keyJButtons[KeyEvent.VK_SHIFT] = shiftOneButton;
+		keyJButtons[0xA0] = shiftOneButton;
 		add(shiftOneButton);
 
 		zButton = new JButton("Z");
@@ -414,7 +436,7 @@ public class TypingTestGUI extends JFrame {
 
 		shiftTwoButton = new JButton("Shift");
 		shiftTwoButton.setBounds(770, 566, 148, 58);
-		keyJButtons[KeyEvent.VK_SHIFT] = shiftTwoButton;
+		keyJButtons[0xA1] = shiftTwoButton;
 		add(shiftTwoButton);
 
 		// fifthRow
@@ -457,5 +479,14 @@ public class TypingTestGUI extends JFrame {
 			}
 			toggle = false;
       }
+	
+	private void PangramReader() {
+		try (BufferedReader br = new BufferedReader(new FileReader(Pangrams))) {
+		    String line;
+		    while ((line = br.readLine()) != null) {
+		       // process the line.
+		    }
+		}
+	}
 
 }
