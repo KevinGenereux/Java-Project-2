@@ -20,6 +20,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,6 +52,11 @@ public class TypingTestGUI extends JFrame {
 	
 	private int countdownTimer;
 	private boolean toggle = true;
+	
+	// wrong things typed, right things typed, corrections for wrong things typed
+    ArrayList<String> incorrect = new ArrayList<String>();
+    ArrayList<String> correct = new ArrayList<String>();
+    ArrayList<String> corrected = new ArrayList<String>();
 	
 	//A constructor for the GUI frame that immediately gets instantiated when the application is opened
 	public TypingTestGUI() {
@@ -117,11 +123,31 @@ public class TypingTestGUI extends JFrame {
 		        	     changeColor(keyJButtons[buttonIndex]);
 		        	 }
 		        	
-		        	//when a key is reset, change its colour back to the default
-		            public void keyReleased(KeyEvent event)
-		            {
-		               resetColor();
-		            } 
+		        	 public void keyReleased(KeyEvent event) {
+		                 if (event.getKeyCode() == KeyEvent.VK_PERIOD) {
+
+		                     // retrieve typed and correct words
+		                     String words[] = typeWordsTextArea.getText().split("\\s");
+		                     String[] rWords = pangramTextArea.getText().split("\\s");
+
+		                     // compare what was typed and what was displayed
+		                     for (int i = 0; i < words.length && i < rWords.length; i++) {
+		                         if (words[i].equals(rWords[i])) {
+		                             correct.add(words[i]);
+		                         } else {
+		                             incorrect.add(words[i]);
+		                             corrected.add(rWords[i]);
+		                         }
+		                     }
+		                     
+		                     //prepare next line
+		                     String[] pangrams = pangramTextArea.getText().split("\n");
+		                     pangramTextArea.setText(pangramTextArea.getText().replaceFirst(pangrams[0] + "\n", ""));
+		                     typeWordsTextArea.setText("");
+
+		                 }
+		                 resetColor();
+		             }
 		            
 		            //declaring an empty method so that all methods in the interface are implemented
 		            public void keyTyped(KeyEvent event)
@@ -156,7 +182,7 @@ public class TypingTestGUI extends JFrame {
 		timeLeftTextField.setHorizontalAlignment(JTextField.CENTER);
 		add(timeLeftTextField);
 
-		WPMLabel = new JLabel("Words Per Minute");
+		WPMLabel = new JLabel("Words Typed Correctly");
 		WPMLabel.setFont(new Font("Serif", Font.BOLD, 16));
 		WPMLabel.setForeground(Color.BLACK);
 		WPMLabel.setBounds(700, 170, 160, 20);
@@ -502,35 +528,51 @@ public class TypingTestGUI extends JFrame {
 	//https://www.youtube.com/watch?v=Euexl32lB8w
 	//The code for the countdown timer was taken from this YouTube video
 	//needed slight modification to work
-	private void startButtonMouseClicked(MouseEvent evt) {
-			//Only run the code if the user clicks on the start button
-			if (toggle) {
-			//allow the user to type in the code
-			typeWordsTextArea.setEnabled(true);
-			//creates a new timer object
-			Timer timer = new Timer();
-			//setting the countdown timer to start at 60 seconds
-            countdownTimer = 60;
-            //creates a new TimerTask object to set the parameters of the timer
-            TimerTask task = new TimerTask() { 
-            	//this keeps running
-                public void run() {
-                	//displays how much time is remaining
-                    timeLeftTextField.setText(Integer.toString(countdownTimer)); 
-                    //decrements the countdown timer
-                    countdownTimer--;
-                    //once the timer has reached 0, deallocate the timer and display results
-                    if (countdownTimer == 0)
-                        timer.cancel();     
-                }
-            };
-            //timer.scheduleAtFixedRate(task, delay, period);
-            timer.scheduleAtFixedRate(task, 0, 1000); 
-			}
-			//prevents the user from repeatedly clicking the start button and creating a bunch of timer buttons
-			//(this was the problem with the code from the YouTube video. It would cause the countdown timer to speed up if you keep clicking on it).
-			toggle = false;
-      }
+	   private void startButtonMouseClicked(MouseEvent evt) {
+	        // Only run the code if the user clicks on the start button
+	        if (toggle) {
+	            // allow the user to type in the code
+	            typeWordsTextArea.setEnabled(true);
+	            // creates a new timer object
+	            Timer timer = new Timer();
+	            // setting the countdown timer to start at 60 seconds
+	            countdownTimer = 60;
+	            // creates a new TimerTask object to set the parameters of the timer
+	            TimerTask task = new TimerTask() {
+	                // this keeps running
+	                public void run() {
+	                    // decrements the countdown timer
+	                    countdownTimer--;
+	                    // displays how much time is remaining
+	                    timeLeftTextField.setText(Integer.toString(countdownTimer));
+	                    // once the timer has reached 0, deallocate the timer and display results
+	                    if (countdownTimer == 0) {
+	                        typeWordsTextArea.setEditable(false);
+	                        timer.cancel();
+	                      //instantiating the GUI frame to open
+	                        ResultsGUI resultsDipslay = new ResultsGUI();
+	                        //Closes the application when the user clicks on exit symbol
+	                        resultsDipslay.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	                        //sets the size of the frame
+	                        resultsDipslay.setSize(700, 640);
+	                        //centers the frame relative to the screen
+	                        resultsDipslay.setLocationRelativeTo(null);
+	                        //Display the frame
+	                        resultsDipslay.setVisible(true);
+	                    }
+	                }
+	            };
+	            // timer.scheduleAtFixedRate(task, delay, period);
+	            timer.scheduleAtFixedRate(task, 0, 1000);
+	        }
+	        // prevents the user from repeatedly clicking the start button and creating a
+	        // bunch of timer buttons
+	        // (this was the problem with the code from the YouTube video. It would cause
+	        // the countdown timer to speed up if you keep clicking on it).
+	        toggle = false;
+	    }
+	
+	
 	
 	//https://www.caveofprogramming.com/java/java-file-reading-and-writing-files-in-java.html
 	private void ReadFile() {
@@ -570,9 +612,4 @@ public class TypingTestGUI extends JFrame {
 
         }
 	}
-	
-	public static boolean CompareWord() {
-		
-	}
-
 }

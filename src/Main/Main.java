@@ -14,5 +14,6 @@ public class Main {
 		keyboardDipslay.setLocationRelativeTo(null);
 		//Display the frame
 		keyboardDipslay.setVisible(true);
+		
 	}
 }
